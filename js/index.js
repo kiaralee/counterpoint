@@ -4,45 +4,83 @@ var cpInt = [];
 
 
 function generateCP() {
-  var n1 = $('#note1').val();
-  var n2 = $('#note2').val();
-  var n3 = $('#note3').val();
-  var n4 = $('#note4').val();
-  var n5 = $('#note5').val();
-  var n6 = $('#note6').val();
 
+  var cantusfirmus = [$('#note1').val(), $('#note2').val(), $('#note3').val(), $('#note4').val(), $('#note5').val(),
+                      $('#note6').val(), $('#note7').val(), $('#note8').val()];
   var key = [];
-  key = keyMatch(n1);
+  key = keyMatch(cantusfirmus[0]);
 
   // beginning and ending note = tonic
   // interval = octave
   cp[0] = key[0];
   cpInt[0] = 8;
-  cp[5] = key[0];
-  cpInt[5] = 8;
+  cp[cantusfirmus.length - 1] = key[0];
+  cpInt[cantusfirmus.length - 1] = 8;
 
   // second to last note = leading tone
   // interval = 6
-  cp[4] = key[6];
-  cpInt[4] = 6;
+  cp[cantusfirmus.length - 2] = key[6];
+  cpInt[cantusfirmus.length - 2] = 6;
 
-  // check note after, note before
-  // chooses one that gives an interval of 6 or 3
+
+  // generates remaining notes:
 
   var noteAbove;
   var noteBelow;
-  // whatever the counterpoint before it is, add one to get the note above
+  var noteTAbove;
+  var noteTBelow;
   var i;
+
   for (i = 1; i < cp.length - 2; i++) {
+
+      // finds notes stepwise or third away from previous counterpoint
       noteAbove = findNoteAbove(cp[(i-1)], key);
-      noteBelow = findNoteBelow(cp[(i-1)], key); // NOTE BELOW DOES NOT WORK?
-      if (findInt(n2, noteAbove) == 3 || findInt(n2, noteAbove) == 6) {
+      noteTAbove = findNoteAbove(findNoteAbove(cp[i-1], key), key);
+      noteBelow = findNoteBelow(cp[(i-1)], key);
+      noteTBelow = findNoteBelow(findNoteBelow(cp[i-1], key), key);
+
+      // note stepwise away
+      if ((findInt(cantusfirmus[i], noteAbove) == 3 || findInt(cantusfirmus[i], noteAbove) == 6) && noteAbove != cp[i-1]) { // 6, 3, stepwise motion above
         cp[i] = noteAbove;
-        cpInt[i] = findInt(n2, cp[i]);
-      } else if (findInt(n2, noteBelow) == 3 || findInt(n2, noteBelow) == 6) {
-        console.log("hello");
+        cpInt[i] = findInt(cantusfirmus[i], cp[i]);
+      } else if ((findInt(cantusfirmus[i], noteBelow) == 3 || findInt(cantusfirmus[i], noteBelow) == 6) && noteBelow != cp[i-1]) { // 6, 3, stepwise motion below
         cp[i] = noteBelow;
-        cpInt[i] = findInt(n2, cp[i]);
+        cpInt[i] = findInt(cantusfirmus[i], cp[i]);
+      } else if ((findInt(cantusfirmus[i], noteAbove) == 5 && cpInt[i-1] != 8 && cpInt[i-1] != 5) && noteAbove != cp[i-1]) { // 5, stepwise above
+        cp[i] = noteAbove;
+        cpInt[i] = 5;
+      } else if ((findInt(cantusfirmus[i], noteBelow) == 5 && cpInt[i-1] != 8 && cpInt[i-1] != 5) && noteBelow != cp[i-1]) { // 5, stepwise below
+        cp[i] = noteBelow;
+        cpInt[i] = 5;
+      } else if (findInt(cantusfirmus[i], noteAbove) == 8 && cpInt[i-1] != 8 && cpInt[i-1] != 5 && noteAbove != cp[i-1]) { // 5, stepwise above
+        cp[i] = noteAbove;
+        cpInt[i] = 8;
+      } else if (findInt(cantusfirmus[i], noteBelow) == 8 && cpInt[i-1] != 8 && cpInt[i-1] != 5 && noteBelow != cp[i-1]) { // 5, stepwise below
+        cp[i] = noteBelow;
+        cpInt[i] = 8;
+      }
+
+      // note third away
+      else if ((findInt(cantusfirmus[i], noteTAbove) == 3 || findInt(cantusfirmus[i], noteTAbove) == 6) && noteTAbove != cp[i-1]) {
+        cp[i] = noteTAbove;
+        cpInt[i] = findInt(cantusfirmus[i], cp[i]);
+      } else if ((findInt(cantusfirmus[i], noteTBelow) == 3 || findInt(cantusfirmus[i], noteTBelow) == 6) && noteTBelow != cp[i-1]) {
+        cp[i] = noteTBelow;
+        cpInt[i] = findInt(cantusfirmus[i], cp[i]);
+      } else if ((findInt(cantusfirmus[i], noteTAbove) == 5 && cpInt[i-1] != 8 && cpInt[i-1] != 5) && noteTAbove != cp[i-1]) {
+        cp[i] = noteTAbove;
+        cpInt[i] = 5;
+      } else if ((findInt(cantusfirmus[i], noteTBelow) == 5 && cpInt[i-1] != 8 && cpInt[i-1] != 5) && noteTBelow != cp[i-1]) {
+        cp[i] = noteTBelow;
+        cpInt[i] = 5;
+      } else if (findInt(cantusfirmus[i], noteTAbove) == 8 && cpInt[i-1] != 8 && cpInt[i-1] != 5 && noteTAbove != cp[i-1]) {
+        cp[i] = noteTAbove;
+        cpInt[i] = 8;
+      } else if (findInt(cantusfirmus[i], noteTBelow) == 8 && cpInt[i-1] != 8 && cpInt[i-1] != 5 && noteTBelow != cp[i-1]) {
+        cp[i] = noteTBelow;
+        cpInt[i] = 8;
+      } else {
+          console.log("error", noteTAbove, noteTBelow);
       }
     }
 
@@ -111,7 +149,7 @@ function findInt(cf, cp) {
   } else if (cf > cp) {
     int = 9 - ((cf - cp) + 1);
   } else {
-    console.log("error", cf, cp);
+    //console.log("error", cf, cp);
   }
   return int;
 }
@@ -133,12 +171,22 @@ function findNoteAbove(oldCP, key) {
 // output: note before
 // finds stepwise below note of previous CP note
 function findNoteBelow(oldCP, key) {
-  console.log(oldCP);
   for (i = 0; i < key.length; i++) {
     if (oldCP == key[i] && (i-1 >= 0)) {
       return key[i-1];
     } else if (oldCP == key[i]) {
-      return key[7];
+      return key[key.length-1];
     }
   }
+}
+
+function isIllegalMelodic() {
+  // if third last note, check that the interval between the two cp notes are <= 3 above || == 2 below
+  // && note != cp[cp.length -2]
+  // return bool
+}
+
+function isIllegalInterval() {
+  // check interval chains of 3 or 6 of > 3 in a row
+  // return bool
 }
