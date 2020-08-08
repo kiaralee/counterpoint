@@ -6,7 +6,7 @@ var cpInt = [];
 function generateCP() {
 
   var cantusfirmus = [$('#note1').val(), $('#note2').val(), $('#note3').val(), $('#note4').val(), $('#note5').val(),
-                      $('#note6').val(), $('#note7').val(), $('#note8').val()];
+                      $('#note6').val(), $('#note7').val(), $('#note8').val(), $('#note9').val(), $('#note10').val()];
   var key = [];
   key = keyMatch(cantusfirmus[0]);
 
@@ -40,15 +40,17 @@ function generateCP() {
       noteTBelow = findNoteBelow(findNoteBelow(cp[i-1], key), key);
 
       // note stepwise away
-      if ((findInt(cantusfirmus[i], noteAbove) == 3 || findInt(cantusfirmus[i], noteAbove) == 6) && noteAbove != cp[i-1]) { // 6, 3, stepwise motion above
+
+
+      if ((findInt(cantusfirmus[i], noteAbove) == 3 || findInt(cantusfirmus[i], noteAbove) == 6) && noteAbove != cp[i-1] && isIllegalInterval(cpInt, findInt(cantusfirmus[i], noteAbove), i) == false) { // 6, 3, stepwise motion above
         cp[i] = noteAbove;
         cpInt[i] = findInt(cantusfirmus[i], cp[i]);
-      } else if ((findInt(cantusfirmus[i], noteBelow) == 3 || findInt(cantusfirmus[i], noteBelow) == 6) && noteBelow != cp[i-1]) { // 6, 3, stepwise motion below
+      } else if ((findInt(cantusfirmus[i], noteBelow) == 3 || findInt(cantusfirmus[i], noteBelow) == 6) && noteBelow != cp[i-1] && isIllegalInterval(cpInt, findInt(cantusfirmus[i], noteBelow), i) == false) { // 6, 3, stepwise motion below
         cp[i] = noteBelow;
         cpInt[i] = findInt(cantusfirmus[i], cp[i]);
       } else if ((findInt(cantusfirmus[i], noteAbove) == 5 && cpInt[i-1] != 8 && cpInt[i-1] != 5) && noteAbove != cp[i-1]) { // 5, stepwise above
-        cp[i] = noteAbove;
-        cpInt[i] = 5;
+          cp[i] = noteAbove;
+          cpInt[i] = 5;
       } else if ((findInt(cantusfirmus[i], noteBelow) == 5 && cpInt[i-1] != 8 && cpInt[i-1] != 5) && noteBelow != cp[i-1]) { // 5, stepwise below
         cp[i] = noteBelow;
         cpInt[i] = 5;
@@ -61,10 +63,10 @@ function generateCP() {
       }
 
       // note third away
-      else if ((findInt(cantusfirmus[i], noteTAbove) == 3 || findInt(cantusfirmus[i], noteTAbove) == 6) && noteTAbove != cp[i-1]) {
+      else if ((findInt(cantusfirmus[i], noteTAbove) == 3 || findInt(cantusfirmus[i], noteTAbove) == 6) && noteTAbove != cp[i-1] && isIllegalInterval(cpInt, findInt(cantusfirmus[i], noteTAbove), i) == false) {
         cp[i] = noteTAbove;
         cpInt[i] = findInt(cantusfirmus[i], cp[i]);
-      } else if ((findInt(cantusfirmus[i], noteTBelow) == 3 || findInt(cantusfirmus[i], noteTBelow) == 6) && noteTBelow != cp[i-1]) {
+      } else if ((findInt(cantusfirmus[i], noteTBelow) == 3 || findInt(cantusfirmus[i], noteTBelow) == 6) && noteTBelow != cp[i-1] && isIllegalInterval(cpInt, findInt(cantusfirmus[i], noteTBelow), i) == false) {
         cp[i] = noteTBelow;
         cpInt[i] = findInt(cantusfirmus[i], cp[i]);
       } else if ((findInt(cantusfirmus[i], noteTAbove) == 5 && cpInt[i-1] != 8 && cpInt[i-1] != 5) && noteTAbove != cp[i-1]) {
@@ -89,18 +91,6 @@ function generateCP() {
   console.log(cp, cpInt);
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 // input: tonic (first note)
 // output: key
@@ -167,7 +157,7 @@ function findNoteAbove(oldCP, key) {
   }
 }
 
-// inout: counterpoint note before, key
+// input: counterpoint note before, key
 // output: note before
 // finds stepwise below note of previous CP note
 function findNoteBelow(oldCP, key) {
@@ -180,13 +170,32 @@ function findNoteBelow(oldCP, key) {
   }
 }
 
+// input: array of all intervals, current interval, current position
+// output: boolean
+// returns whether or not there is an illegal interval chain
+function isIllegalInterval(allInts, current, pos) {
+  if (pos > 3) {
+    var counter = 0;
+    console.log(allInts, current, pos);
+    for (i = 1; i < pos; i++) {
+      if (allInts[i] == allInts[i+1] && allInts[i+1] != null && allInts[i] == current) {
+        counter++;
+        if (counter > 1) {
+          console.log("ILLEGAL", counter);
+          return true;
+        }
+      }
+    }
+  } else {
+    return false;
+  }
+}
+
+
+
+
 function isIllegalMelodic() {
   // if third last note, check that the interval between the two cp notes are <= 3 above || == 2 below
   // && note != cp[cp.length -2]
-  // return bool
-}
-
-function isIllegalInterval() {
-  // check interval chains of 3 or 6 of > 3 in a row
   // return bool
 }
