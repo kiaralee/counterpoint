@@ -30,6 +30,7 @@ function generateCP() {
   var noteTAbove;
   var noteTBelow;
   var i;
+  var tie = false;
 
   for (i = 1; i < cp.length - 2; i++) {
 
@@ -42,54 +43,55 @@ function generateCP() {
       // note stepwise away
 
 
-      if ((findInt(cantusfirmus[i], noteAbove) == 3 || findInt(cantusfirmus[i], noteAbove) == 6) && noteAbove != cp[i-1] && isIllegalInterval(cpInt, findInt(cantusfirmus[i], noteAbove), i) == false) { // 6, 3, stepwise motion above
+      if ((findInt(cantusfirmus[i], noteAbove) == 3 || findInt(cantusfirmus[i], noteAbove) == 6) && noteAbove != cp[i-1] && isIllegalInterval(cpInt, findInt(cantusfirmus[i], noteAbove), i) == false && noteAbove != cp[i+1]) { // 6, 3, stepwise motion above
         cp[i] = noteAbove;
         cpInt[i] = findInt(cantusfirmus[i], cp[i]);
-      } else if ((findInt(cantusfirmus[i], noteBelow) == 3 || findInt(cantusfirmus[i], noteBelow) == 6) && noteBelow != cp[i-1] && isIllegalInterval(cpInt, findInt(cantusfirmus[i], noteBelow), i) == false) { // 6, 3, stepwise motion below
+      } else if ((findInt(cantusfirmus[i], noteBelow) == 3 || findInt(cantusfirmus[i], noteBelow) == 6) && noteBelow != cp[i-1] && isIllegalInterval(cpInt, findInt(cantusfirmus[i], noteBelow), i) == false && noteBelow != cp[i+1]) { // 6, 3, stepwise motion below
         cp[i] = noteBelow;
         cpInt[i] = findInt(cantusfirmus[i], cp[i]);
-      } else if ((findInt(cantusfirmus[i], noteAbove) == 5 && cpInt[i-1] != 8 && cpInt[i-1] != 5) && noteAbove != cp[i-1]) { // 5, stepwise above
+      } else if ((findInt(cantusfirmus[i], noteAbove) == 5 && cpInt[i-1] != 8 && cpInt[i-1] != 5) && noteAbove != cp[i-1] && noteAbove != cp[i+1]) { // 5, stepwise above
           cp[i] = noteAbove;
           cpInt[i] = 5;
-      } else if ((findInt(cantusfirmus[i], noteBelow) == 5 && cpInt[i-1] != 8 && cpInt[i-1] != 5) && noteBelow != cp[i-1]) { // 5, stepwise below
+      } else if ((findInt(cantusfirmus[i], noteBelow) == 5 && cpInt[i-1] != 8 && cpInt[i-1] != 5) && noteBelow != cp[i-1] && noteBelow != cp[i+1]) { // 5, stepwise below
         cp[i] = noteBelow;
         cpInt[i] = 5;
-      } else if (findInt(cantusfirmus[i], noteAbove) == 8 && cpInt[i-1] != 8 && cpInt[i-1] != 5 && noteAbove != cp[i-1]) { // 5, stepwise above
+      } else if (findInt(cantusfirmus[i], noteAbove) == 8 && cpInt[i-1] != 8 && cpInt[i-1] != 5 && noteAbove != cp[i-1] && noteAbove != cp[i+1]) { // 5, stepwise above
         cp[i] = noteAbove;
         cpInt[i] = 8;
-      } else if (findInt(cantusfirmus[i], noteBelow) == 8 && cpInt[i-1] != 8 && cpInt[i-1] != 5 && noteBelow != cp[i-1]) { // 5, stepwise below
+      } else if (findInt(cantusfirmus[i], noteBelow) == 8 && cpInt[i-1] != 8 && cpInt[i-1] != 5 && noteBelow != cp[i-1] && noteBelow != cp[i+1]) { // 5, stepwise below
         cp[i] = noteBelow;
         cpInt[i] = 8;
       }
 
       // note third away
-      else if ((findInt(cantusfirmus[i], noteTAbove) == 3 || findInt(cantusfirmus[i], noteTAbove) == 6) && noteTAbove != cp[i-1] && isIllegalInterval(cpInt, findInt(cantusfirmus[i], noteTAbove), i) == false) {
+      else if ((findInt(cantusfirmus[i], noteTAbove) == 3 || findInt(cantusfirmus[i], noteTAbove) == 6) && noteTAbove != cp[i-1] && isIllegalInterval(cpInt, findInt(cantusfirmus[i], noteTAbove), i) == false && noteTAbove != cp[i+1]) {
         cp[i] = noteTAbove;
         cpInt[i] = findInt(cantusfirmus[i], cp[i]);
-      } else if ((findInt(cantusfirmus[i], noteTBelow) == 3 || findInt(cantusfirmus[i], noteTBelow) == 6) && noteTBelow != cp[i-1] && isIllegalInterval(cpInt, findInt(cantusfirmus[i], noteTBelow), i) == false) {
-        cp[i] = noteTBelow;
-        cpInt[i] = findInt(cantusfirmus[i], cp[i]);
-      } else if ((findInt(cantusfirmus[i], noteTAbove) == 5 && cpInt[i-1] != 8 && cpInt[i-1] != 5) && noteTAbove != cp[i-1]) {
-        cp[i] = noteTAbove;
-        cpInt[i] = 5;
-      } else if ((findInt(cantusfirmus[i], noteTBelow) == 5 && cpInt[i-1] != 8 && cpInt[i-1] != 5) && noteTBelow != cp[i-1]) {
-        cp[i] = noteTBelow;
-        cpInt[i] = 5;
-      } else if (findInt(cantusfirmus[i], noteTAbove) == 8 && cpInt[i-1] != 8 && cpInt[i-1] != 5 && noteTAbove != cp[i-1]) {
-        cp[i] = noteTAbove;
-        cpInt[i] = 8;
-      } else if (findInt(cantusfirmus[i], noteTBelow) == 8 && cpInt[i-1] != 8 && cpInt[i-1] != 5 && noteTBelow != cp[i-1]) {
-        cp[i] = noteTBelow;
-        cpInt[i] = 8;
+      } else if ((findInt(cantusfirmus[i], noteTBelow) == 3 || findInt(cantusfirmus[i], noteTBelow) == 6) && noteTBelow != cp[i-1] && isIllegalInterval(cpInt, findInt(cantusfirmus[i], noteTBelow), i) == false && noteTBelow != cp[i+1]) {
+          cp[i] = noteTBelow;
+          cpInt[i] = findInt(cantusfirmus[i], cp[i]);
+      } else if ((findInt(cantusfirmus[i], noteTAbove) == 5 && cpInt[i-1] != 8 && cpInt[i-1] != 5) && noteTAbove != cp[i-1] && noteTAbove != cp[i+1]) {
+          cp[i] = noteTAbove;
+          cpInt[i] = 5;
+      } else if ((findInt(cantusfirmus[i], noteTBelow) == 5 && cpInt[i-1] != 8 && cpInt[i-1] != 5) && noteTBelow != cp[i-1] && noteTBelow != cp[i+1]) {
+          cp[i] = noteTBelow;
+          cpInt[i] = 5;
+      } else if (findInt(cantusfirmus[i], noteTAbove) == 8 && cpInt[i-1] != 8 && cpInt[i-1] != 5 && noteTAbove != cp[i-1] && noteTAbove != cp[i+1]) {
+          cp[i] = noteTAbove;
+          cpInt[i] = 8;
+      } else if (findInt(cantusfirmus[i], noteTBelow) == 8 && cpInt[i-1] != 8 && cpInt[i-1] != 5 && noteTBelow != cp[i-1] && noteTBelow != cp[i+1]) {
+          cp[i] = noteTBelow;
+          cpInt[i] = 8;
+      } else if ((findInt(cantusfirmus[i], cp[i-1]) == 6 || findInt(cantusfirmus[i], cp[i-1]) == 3) && tie == false && cp[i-1] != cp[i+1]) {
+          tie = true;
+          cp[i] = cp[i-1];
+          cpInt[i] = findInt(cantusfirmus[i], cp[i]);
       } else {
-          console.log("error", noteTAbove, noteTBelow);
+        console.log("error", noteTAbove, noteTBelow, noteAbove, noteBelow);
+        console.log(noteTBelow, findInt(cantusfirmus[i], noteTBelow), isIllegalInterval(cpInt, findInt(cantusfirmus[i], noteTAbove), i));
       }
     }
-
-
-
   console.log(cp, cpInt);
-
 }
 
 // input: tonic (first note)
@@ -174,14 +176,13 @@ function findNoteBelow(oldCP, key) {
 // output: boolean
 // returns whether or not there is an illegal interval chain
 function isIllegalInterval(allInts, current, pos) {
-  if (pos > 3) {
+  if (pos > 3 && current == allInts[pos-1]) {
     var counter = 0;
-    console.log(allInts, current, pos);
-    for (i = 1; i < pos; i++) {
-      if (allInts[i] == allInts[i+1] && allInts[i+1] != null && allInts[i] == current) {
+    for (i = pos-1; i > 0; i--) {
+      while (allInts[i] == allInts[i-1] && allInts[i] == current) {
         counter++;
         if (counter > 1) {
-          console.log("ILLEGAL", counter);
+          console.log("ILLEGAL", current);
           return true;
         }
       }
