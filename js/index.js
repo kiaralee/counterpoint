@@ -22,20 +22,27 @@ function generateCP() {
   cp[cantusfirmus.length - 2] = key[6];
   cpInt[cantusfirmus.length - 2] = 6;
 
-
+ // MAKE THIS HIS OWN FUNCTION :)
   // generates remaining notes:
 
-  var noteAbove, noteBelow, noteTAbove, noteTBelow, i, direction;
+  var noteAbove, noteBelow, noteTAbove, noteTBelow, i;
   var tie = false;
-  var leap = false;
-
+  var leapInfo = [];
   for (i = 1; i < cp.length - 2; i++) {
 
       // finds notes stepwise or third away from previous counterpoint
-      noteAbove = findNoteAbove(cp[(i-1)], key);
-      noteTAbove = findNoteAbove(findNoteAbove(cp[i-1], key), key);
-      noteBelow = findNoteBelow(cp[(i-1)], key);
-      noteTBelow = findNoteBelow(findNoteBelow(cp[i-1], key), key);
+      if (leapInfo[0] == "false" || leapInfo[0] == null) {
+        noteAbove = findNoteAbove(cp[(i-1)], key);
+        noteTAbove = findNoteAbove(findNoteAbove(cp[i-1], key), key);
+        noteBelow = findNoteBelow(cp[(i-1)], key);
+        noteTBelow = findNoteBelow(findNoteBelow(cp[i-1], key), key);
+      } else {
+        noteAbove = leapInfo[1];
+        noteTAbove = leapInfo[1];
+        noteBelow = leapInfo[1];
+        noteTBelow = leapInfo[1];
+      }
+
 
       // note stepwise away
 
@@ -85,14 +92,15 @@ function generateCP() {
           cpInt[i] = findInt(cantusfirmus[i], cp[i]);
       } else {
         console.log("error", noteTAbove, noteTBelow, noteAbove, noteBelow);
-        console.log(noteTBelow, findInt(cantusfirmus[i], noteTBelow), isIllegalInterval(cpInt, findInt(cantusfirmus[i], noteTAbove), i));
+        // go back one, and don't use the illegal note
       }
+      leapInfo = isLeap(noteTAbove, noteTBelow, cp, i, key);
     }
   console.log(cp, cpInt);
 }
 
 // input: tonic (first note)
-// output: key
+// output: array containing all notes of the key
 // builds an array of 7 notes based on the given 1st note
 function keyMatch(n) {
   var tonic = 100;
@@ -137,8 +145,6 @@ function findInt(cf, cp) {
     int = (cp - cf) + 1;
   } else if (cf > cp) {
     int = 9 - ((cf - cp) + 1);
-  } else {
-    //console.log("error", cf, cp);
   }
   return int;
 }
@@ -186,6 +192,21 @@ function isIllegalInterval(allInts, current, pos) {
   } else {
     return false;
   }
+}
+
+// input: note one third above, note one third below, array of cp notes, current position, key
+// output: array of leap information
+// determines whether or not a leap has occured, and the correct resolution note
+function findLeaps(above, below, cp, pos, key) {
+  var leapInfo = [];
+  if (cp[pos] == above) {
+    leapInfo[0] = "true";
+    leapInfo[1] = findNoteBelow(cp[pos], key);
+  } else if (cp[pos] == below) {
+    leapInfo[0] = "true";
+    leapInfo[1] = findNoteAbove(cp[pos], key);
+  }
+  return leapInfo;
 }
 
 
