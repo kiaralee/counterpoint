@@ -30,17 +30,25 @@ function generateCP() {
   var leapInfo = [];
   for (i = 1; i < cp.length - 2; i++) {
 
-      // finds notes stepwise or third away from previous counterpoint
-      if (leapInfo[0] == "false" || leapInfo[0] == null) {
+      // finds all legal notes
+      if (leapInfo[0] != "true" || leapInfo[0] == null && i != cp.length - 3) {
         noteAbove = findNoteAbove(cp[(i-1)], key);
         noteTAbove = findNoteAbove(findNoteAbove(cp[i-1], key), key);
         noteBelow = findNoteBelow(cp[(i-1)], key);
         noteTBelow = findNoteBelow(findNoteBelow(cp[i-1], key), key);
       } else {
-        noteAbove = leapInfo[1];
-        noteTAbove = leapInfo[1];
-        noteBelow = leapInfo[1];
-        noteTBelow = leapInfo[1];
+        if (i == cp.length - 3 && leapInfo[0] != "true") {
+            // else if: note should be stepwise above or below the following note OR correct resolution
+            noteAbove = findNoteAbove(cp[(i-1)], key);
+            noteBelow = findNoteBelow(cp[(i-1)], key);
+            noteTAbove = findNoteAbove(cp[(i-1)], key);
+            noteTBelow = findNoteBelow(cp[(i-1)], key);
+        } else {
+          noteAbove = leapInfo[1];
+          noteBelow = leapInfo[1];
+          noteTAbove = leapInfo[1];
+          noteTBelow = leapInfo[1];
+        }
       }
 
 
@@ -197,7 +205,7 @@ function isIllegalInterval(allInts, current, pos) {
 // input: note one third above, note one third below, array of cp notes, current position, key
 // output: array of leap information
 // determines whether or not a leap has occured, and the correct resolution note
-function findLeaps(above, below, cp, pos, key) {
+function isLeap(above, below, cp, pos, key) {
   var leapInfo = [];
   if (cp[pos] == above) {
     leapInfo[0] = "true";
@@ -205,6 +213,9 @@ function findLeaps(above, below, cp, pos, key) {
   } else if (cp[pos] == below) {
     leapInfo[0] = "true";
     leapInfo[1] = findNoteAbove(cp[pos], key);
+  } else {
+    leapInfo[0] = "false";
+    leapInfo[1] = null;
   }
   return leapInfo;
 }
