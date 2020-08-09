@@ -25,12 +25,9 @@ function generateCP() {
 
   // generates remaining notes:
 
-  var noteAbove;
-  var noteBelow;
-  var noteTAbove;
-  var noteTBelow;
-  var i;
+  var noteAbove, noteBelow, noteTAbove, noteTBelow, i, direction;
   var tie = false;
+  var leap = false;
 
   for (i = 1; i < cp.length - 2; i++) {
 
@@ -174,7 +171,7 @@ function findNoteBelow(oldCP, key) {
 
 // input: array of all intervals, current interval, current position
 // output: boolean
-// returns whether or not there is an illegal interval chain
+// works backwards from current position to determine if there is an illegal interval chain
 function isIllegalInterval(allInts, current, pos) {
   if (pos > 3 && current == allInts[pos-1]) {
     var counter = 0;
@@ -182,7 +179,6 @@ function isIllegalInterval(allInts, current, pos) {
       while (allInts[i] == allInts[i-1] && allInts[i] == current) {
         counter++;
         if (counter > 1) {
-          console.log("ILLEGAL", current);
           return true;
         }
       }
@@ -193,10 +189,10 @@ function isIllegalInterval(allInts, current, pos) {
 }
 
 
-
-
 function isIllegalMelodic() {
   // if third last note, check that the interval between the two cp notes are <= 3 above || == 2 below
   // && note != cp[cp.length -2]
   // return bool
+  // if we have just leapt a third, the next note MUST be the next note in the opposite direction of the leapt
+    // boolean to save a leap and the direction
 }
