@@ -33,30 +33,43 @@ function generateCP() {
 
 function fillCounterpoint(cantusfirmus, key) {
 
-  var noteAbove, noteBelow, noteTAbove, noteTBelow, i;
+  var noteAbove, noteBelow, noteTAbove, noteTBelow, i, illegalNote, illegalPos;
   var tie = false;
   var leapInfo = [];
   for (i = 1; i < cp.length - 2; i++) {
 
       // finds all legal notes
-      if (leapInfo[0] != "true" && i != cp.length - 3) {
+      if (leapInfo[0] != "true" && i != cp.length - 3 && i != illegalPos) {
         noteAbove = findNoteAbove(cp[(i-1)], key);
         noteTAbove = findNoteAbove(findNoteAbove(cp[i-1], key), key);
         noteBelow = findNoteBelow(cp[(i-1)], key);
         noteTBelow = findNoteBelow(findNoteBelow(cp[i-1], key), key);
-      } else {
-        if (i == cp.length - 3 && leapInfo[0] != "true") {
-            // else if: note should be stepwise above or below the following note OR correct resolution
-            noteAbove = findNoteAbove(cp[(i-1)], key);
-            noteBelow = findNoteBelow(cp[(i-1)], key);
-            noteTAbove = findNoteAbove(cp[(i-1)], key);
-            noteTBelow = findNoteBelow(cp[(i-1)], key);
-        } else {
-          noteAbove = leapInfo[1];
-          noteBelow = leapInfo[1];
-          noteTAbove = leapInfo[1];
-          noteTBelow = leapInfo[1];
+      } else if (i == cp.length - 3 && leapInfo[0] != "true") {
+          noteAbove = findNoteAbove(cp[(i-1)], key);
+          noteBelow = findNoteBelow(cp[(i-1)], key);
+          noteTAbove = findNoteAbove(cp[(i-1)], key);
+          noteTBelow = findNoteBelow(cp[(i-1)], key);
+      } else if (i == illegalPos) {
+        noteAbove = findNoteAbove(cp[(i-1)], key);
+        noteTAbove = findNoteAbove(findNoteAbove(cp[i-1], key), key);
+        noteBelow = findNoteBelow(cp[(i-1)], key);
+        noteTBelow = findNoteBelow(findNoteBelow(cp[i-1], key), key);
+        if (noteAbove == illegalNote) {
+          noteAbove = null;
+        } else if (noteBelow == illegalNote) {
+          noteBelow = null;
+        } else if (noteTAbove == illegalNote) {
+          noteTAbove = null;
+        } else if (noteTBelow == illegalNote) {
+          noteTBelow = null;
         }
+        illegalPos = null;
+        illegalNote = null;
+      } else {
+        noteAbove = leapInfo[1];
+        noteBelow = leapInfo[1];
+        noteTAbove = leapInfo[1];
+        noteTBelow = leapInfo[1];
       }
 
 
@@ -106,6 +119,12 @@ function fillCounterpoint(cantusfirmus, key) {
           cpInt[i] = findInt(cantusfirmus[i], cp[i]);
       } else {
         console.log("error", noteTAbove, noteTBelow, noteAbove, noteBelow);
+        illegalNote = cp[i-1];
+        illegalPos = i-1;
+        for (x = 1; x <= cp.length - 2; x++) {
+          cp[x] = null;
+        }
+        fillCounterpoint(cantusfirmus, key);
         // call entire for loop again, but this time do not include the illegal note at that position
           // save: illegal note, position
       }
