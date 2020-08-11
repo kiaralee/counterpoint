@@ -22,8 +22,16 @@ function generateCP() {
   cp[cantusfirmus.length - 2] = key[6];
   cpInt[cantusfirmus.length - 2] = 6;
 
+  fillCounterpoint(cantusfirmus, key);
+
+  console.log(cp, cpInt);
+}
+
+
  // MAKE THIS HIS OWN FUNCTION :)
   // generates remaining notes:
+
+function fillCounterpoint(cantusfirmus, key) {
 
   var noteAbove, noteBelow, noteTAbove, noteTBelow, i;
   var tie = false;
@@ -31,7 +39,7 @@ function generateCP() {
   for (i = 1; i < cp.length - 2; i++) {
 
       // finds all legal notes
-      if (leapInfo[0] != "true" || leapInfo[0] == null && i != cp.length - 3) {
+      if (leapInfo[0] != "true" && i != cp.length - 3) {
         noteAbove = findNoteAbove(cp[(i-1)], key);
         noteTAbove = findNoteAbove(findNoteAbove(cp[i-1], key), key);
         noteBelow = findNoteBelow(cp[(i-1)], key);
@@ -52,9 +60,7 @@ function generateCP() {
       }
 
 
-      // note stepwise away
-
-
+      // notes stepwise away
       if ((findInt(cantusfirmus[i], noteAbove) == 3 || findInt(cantusfirmus[i], noteAbove) == 6) && noteAbove != cp[i-1] && isIllegalInterval(cpInt, findInt(cantusfirmus[i], noteAbove), i) == false && noteAbove != cp[i+1]) { // 6, 3, stepwise motion above
         cp[i] = noteAbove;
         cpInt[i] = findInt(cantusfirmus[i], cp[i]);
@@ -75,7 +81,7 @@ function generateCP() {
         cpInt[i] = 8;
       }
 
-      // note third away
+      // notes third away
       else if ((findInt(cantusfirmus[i], noteTAbove) == 3 || findInt(cantusfirmus[i], noteTAbove) == 6) && noteTAbove != cp[i-1] && isIllegalInterval(cpInt, findInt(cantusfirmus[i], noteTAbove), i) == false && noteTAbove != cp[i+1]) {
         cp[i] = noteTAbove;
         cpInt[i] = findInt(cantusfirmus[i], cp[i]);
@@ -100,11 +106,16 @@ function generateCP() {
           cpInt[i] = findInt(cantusfirmus[i], cp[i]);
       } else {
         console.log("error", noteTAbove, noteTBelow, noteAbove, noteBelow);
-        // go back one, and don't use the illegal note
+        // call entire for loop again, but this time do not include the illegal note at that position
+          // save: illegal note, position
       }
-      leapInfo = isLeap(noteTAbove, noteTBelow, cp, i, key);
+      if (leapInfo[0] == "true") {
+        leapInfo[0] = "false";
+        leapInfo[1] = null;
+      } else {
+        leapInfo = isLeap(noteTAbove, noteTBelow, cp, i, key);
+      }
     }
-  console.log(cp, cpInt);
 }
 
 // input: tonic (first note)
@@ -200,6 +211,7 @@ function isIllegalInterval(allInts, current, pos) {
   } else {
     return false;
   }
+  return false;
 }
 
 // input: note one third above, note one third below, array of cp notes, current position, key
@@ -221,10 +233,8 @@ function isLeap(above, below, cp, pos, key) {
 }
 
 
-function isIllegalMelodic() {
   // if third last note, check that the interval between the two cp notes are <= 3 above || == 2 below
   // && note != cp[cp.length -2]
   // return bool
   // if we have just leapt a third, the next note MUST be the next note in the opposite direction of the leapt
     // boolean to save a leap and the direction
-}
