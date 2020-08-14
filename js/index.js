@@ -2,6 +2,14 @@ var notes = ["A", "B", "C", "D", "E", "F", "G"];
 var cp = [];
 var cpInt = [];
 
+VF = Vex.Flow;
+var div = document.getElementById("boo")
+var renderer = new VF.Renderer(div, VF.Renderer.Backends.SVG);
+renderer.resize(500, 1000);
+var context = renderer.getContext();
+var stave = new VF.Stave(10, 40, 1000);
+stave.addClef("treble").addTimeSignature("10/4");
+stave.setContext(context).draw();
 
 function generateCP() {
 
@@ -9,6 +17,11 @@ function generateCP() {
                       $('#note6').val(), $('#note7').val(), $('#note8').val(), $('#note9').val(), $('#note10').val()];
   var key = [];
   key = keyMatch(cantusfirmus[0]);
+
+  var cfOcts = [];
+  for (c = 0; c < cantusfirmus.length; c++) {
+    cfOcts[c] = "4";
+  }
 
   // beginning and ending note = tonic
   // interval = octave
@@ -23,13 +36,31 @@ function generateCP() {
   cpInt[cantusfirmus.length - 2] = 6;
 
   fillCounterpoint(cantusfirmus, key);
+  drawScore(cantusfirmus, cfOcts, cp);
 
   console.log(cp, cpInt);
 }
 
+function drawScore(cf, cfOcts, cp) {
 
- // MAKE THIS HIS OWN FUNCTION :)
-  // generates remaining notes:
+  var notes = [
+    new VF.StaveNote({clef: "treble", keys: [cf[0] + "/" + cfOcts[0]], duration: "q" }),
+    new VF.StaveNote({clef: "treble", keys: [cf[1] + "/" + cfOcts[1]], duration: "q" }),
+    new VF.StaveNote({clef: "treble", keys: [cf[2] + "/" + cfOcts[2]], duration: "q" }),
+    new VF.StaveNote({clef: "treble", keys: [cf[3] + "/" + cfOcts[3]], duration: "q" }),
+    new VF.StaveNote({clef: "treble", keys: [cf[4] + "/" + cfOcts[4]], duration: "q" }),
+    new VF.StaveNote({clef: "treble", keys: [cf[5] + "/" + cfOcts[5]], duration: "q" }),
+    new VF.StaveNote({clef: "treble", keys: [cf[6] + "/" + cfOcts[6]], duration: "q" }),
+    new VF.StaveNote({clef: "treble", keys: [cf[7] + "/" + cfOcts[7]], duration: "q" }),
+    new VF.StaveNote({clef: "treble", keys: [cf[8] + "/" + cfOcts[8]], duration: "q" }),
+    new VF.StaveNote({clef: "treble", keys: [cf[9] + "/" + cfOcts[9]], duration: "q" })
+  ];
+  var voice = new VF.Voice({num_beats: 10,  beat_value: 4});
+  voice.addTickables(notes);
+  var formatter = new VF.Formatter().joinVoices([voice]).format([voice], 400);
+  voice.draw(context, stave);
+
+}
 
 function fillCounterpoint(cantusfirmus, key) {
 
@@ -118,15 +149,13 @@ function fillCounterpoint(cantusfirmus, key) {
           cp[i] = cp[i-1];
           cpInt[i] = findInt(cantusfirmus[i], cp[i]);
       } else {
-        console.log("error", noteTAbove, noteTBelow, noteAbove, noteBelow);
+        console.log("error", noteAbove, findInt(cantusfirmus[i], noteAbove), isIllegalInterval(cpInt, findInt(cantusfirmus[i], noteAbove), i));
         illegalNote = cp[i-1];
         illegalPos = i-1;
         for (x = 1; x <= cp.length - 2; x++) {
           cp[x] = null;
         }
-        fillCounterpoint(cantusfirmus, key);
-        // call entire for loop again, but this time do not include the illegal note at that position
-          // save: illegal note, position
+        //fillCounterpoint(cantusfirmus, key);
       }
       if (leapInfo[0] == "true") {
         leapInfo[0] = "false";
@@ -220,11 +249,13 @@ function isIllegalInterval(allInts, current, pos) {
   if (pos > 3 && current == allInts[pos-1]) {
     var counter = 0;
     for (i = pos-1; i > 0; i--) {
-      while (allInts[i] == allInts[i-1] && allInts[i] == current) {
+      if (allInts[i] == allInts[i-1] && allInts[i] == current) {
         counter++;
-        if (counter > 1) {
+        if (counter > 2) {
           return true;
         }
+      } else {
+        counter = 0;
       }
     }
   } else {
